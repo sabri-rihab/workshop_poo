@@ -10,7 +10,7 @@ require_once '.\..\Core\Database.php';
     }
 
     function add_book(Book $book) {
-        $stmt = $this->db->prepare("INSERT into book VALUES (?, ?, ?, ?");
+        $stmt = $this->db->prepare("INSERT into book(`title`, `author_id`, `price`, `stock`) VALUES (?, ?, ?, ?)");
         $stmt->execute([
             $book->getTitle(),
             $book->getAthor(),
