@@ -9,6 +9,35 @@ require_once '.\..\Core\Database.php';
         $this->db = Database::getConnection();
     }
 
+    //---------------------     read all    --------------------
+    public function readAll(){
+        $stmt = $this->db->prepare("SELECT b.title , a.name as 'AuthorName', b.price, b.stock
+            FROM book b
+            LEFT JOIN  author a on a._id = b.author_id;");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
+    //---------------------     find book by title    --------------------
+    public function find_book_by_title($title){
+        $stmt = $this->db->prepare("SELECT b.title , a.name as 'AuthorName', b.price, b.stock
+            FROM book b
+            LEFT JOIN  author a on a._id = b.author_id
+            where b.title = :title;
+            ");
+
+        $stmt->execute([':title' => $title]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $books = [];
+        foreach($result as $book){
+            $books[] = new Book ($book['title'], $book['AuthorName'], $book['price'], $book['stock']);
+        }
+        return $books;
+    }
+
+
+
     function add_book(Book $book) {
         $stmt = $this->db->prepare("INSERT into book(`title`, `author_id`, `price`, `stock`) VALUES (?, ?, ?, ?)");
         $stmt->execute([
@@ -19,6 +48,9 @@ require_once '.\..\Core\Database.php';
         ]);
         return $stmt->rowCount() >= 1;
     }
+
+
+
 
 
     function checkIfAuthorExist($name) {
